@@ -1,0 +1,21 @@
+{
+  "name": "app-serverless",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Syed-Bilal-Haider-Engineer/node-application-serverless.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Syed-Bilal-Haider-Engineer/node-application-serverless/issues"
+  },
+  "homepage": "https://github.com/Syed-Bilal-Haider-Engineer/node-application-serverless#readme"
+}
