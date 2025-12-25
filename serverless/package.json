@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^6.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.953.0",
+    "@aws-sdk/lib-dynamodb": "^3.953.0",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3"
+  }
+}
