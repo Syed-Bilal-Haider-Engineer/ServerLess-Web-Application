@@ -1,0 +1,108 @@
+service: my-service 
+
+plugins:
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  httpApi:
+   cors: true
+  runtime: nodejs22.x
+  region: us-east-1
+  environment:
+    JWT_SECRET: ${env:JWT_SECRET}
+    BUCKET_NAME: ${self:service}-uploads-${sls:stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+            - dynamodb:Query
+          Resource:
+            - Fn::GetAtt: [ MyTable, Arn ] 
+            - Fn::Join: [ "/", [ { "Fn::GetAtt": [ "MyTable", "Arn" ] }, "index/*" ] ]
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:PutObjectAcl
+            - s3:ListBucket
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource:
+            - Fn::Join: [ "", [ { "Fn::GetAtt": [ UserBucket, Arn ] }, "/*" ] ]
+functions:
+  signUp:
+    handler: handler.signUp
+    events:
+      - httpApi: 'POST /signUp'
+  login:
+    handler: handler.login
+    events:
+      - httpApi: 'POST /login'
+  getOne:
+    handler: handler.getOne
+    events:
+      - httpApi: 'GET /user/{id}'
+  getAll:
+    handler: handler.getAll
+    events:
+      - httpApi: 'GET /getAllUsers'
+  delete:
+    handler: handler.delete
+    events:
+      - httpApi: 'DELETE /user/{id}'
+  UploadImage:
+    handler: handler.uploadImage
+    events:
+      - httpApi: 'POST /uploadImage'
+  getGallery:
+    handler: handler.getGallery
+    events:
+      - httpApi: 'GET /gallery/{email}'
+
+resources:
+  Resources:
+    MyTable: 
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: users 
+        
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: EmailIndex
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH 
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+    
+    UserBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: my-user-uploads-unique-gallaries-2025
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerPreferred
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods: [GET, PUT, POST, DELETE]
+              AllowedOrigins: ['*']
+              AllowedHeaders: ['*']
